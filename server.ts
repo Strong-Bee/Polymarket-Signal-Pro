@@ -755,6 +755,33 @@ function recalculateUserPortfolio() {
 
   const totalValue = Number((cashBalance + userPositions.reduce((acc, p) => acc + p.currentValue, 0)).toFixed(2));
   
+  // Auto Trade Engine: Max Drawdown Protection
+  const MAX_UNREALIZED_DRAWDOWN = -5000; // Hardcoded threshold for portfolio drawdown limit
+  if (unrealizedTotal <= MAX_UNREALIZED_DRAWDOWN) {
+    let pausedBots = false;
+    bots.forEach(bot => {
+      if (bot.isActive) {
+        bot.isActive = false;
+        pausedBots = true;
+        
+        const ddAlert: SystemAlert = {
+          id: `alert-dd-stop-${Date.now()}-${bot.id}`,
+          type: "RISK_LIMIT",
+          title: "Max Drawdown Triggered",
+          message: `Portfolio unrealized PnL ($${unrealizedTotal}) exceeded max drawdown threshold. ${bot.name} is now disabled.`,
+          timestamp: Date.now(),
+          severity: "CRITICAL"
+        };
+        alerts.unshift(ddAlert);
+        broadcastToAll({ type: "ALERT", payload: ddAlert });
+      }
+    });
+
+    if (pausedBots) {
+      broadcastToAll({ type: "BOTS_UPDATE", payload: bots });
+    }
+  }
+
   // Track continuous returns in equity graph every hour or tick
   const curTimeSec = Math.floor(Date.now() / 1000);
   if (equityHistory.length === 0 || equityHistory[equityHistory.length - 1].timestamp < curTimeSec - 5) {
