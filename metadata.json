@@ -1,0 +1,6 @@
+{
+  "name": "Aegis Polymarket AI Terminal",
+  "description": "An institutional-grade, dark-themed AI Trading Terminal for Polymarket featuring real-time signal generation, a paper trading execution engine, copy-whale trackers, and live Portfolio analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

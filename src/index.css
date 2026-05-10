@@ -1,0 +1,92 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+/* Custom Scrollbar styled for dark technical dashboards */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #090a0f;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1f293d;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2d3d5a;
+}
+
+/* Technical neon glows and animations */
+@keyframes neon-pulse-green {
+  0%, 100% { box-shadow: 0 0 4px rgba(0, 255, 136, 0.2); }
+  50% { box-shadow: 0 0 12px rgba(0, 255, 136, 0.5); }
+}
+
+@keyframes neon-pulse-red {
+  0%, 100% { box-shadow: 0 0 4px rgba(255, 59, 92, 0.2); }
+  50% { box-shadow: 0 0 12px rgba(255, 59, 92, 0.5); }
+}
+
+@keyframes flash-green {
+  0% { background-color: rgba(0, 255, 136, 0.25); }
+  100% { background-color: transparent; }
+}
+
+@keyframes flash-red {
+  0% { background-color: rgba(255, 59, 92, 0.25); }
+  100% { background-color: transparent; }
+}
+
+.animate-glow-green {
+  animation: neon-pulse-green 2s infinite ease-in-out;
+}
+
+.animate-glow-red {
+  animation: neon-pulse-red 2s infinite ease-in-out;
+}
+
+.flash-up {
+  animation: flash-green 1s ease-out forwards;
+}
+
+.flash-down {
+  animation: flash-red 1s ease-out forwards;
+}
+
+/* Glassmorphism custom components */
+.glass-panel {
+  background: rgba(13, 17, 28, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-panel-active {
+  background: rgba(22, 28, 45, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 255, 136, 0.25);
+}
+
+.glass-dropdown {
+  background: rgba(9, 10, 15, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+/* Hide input arrows */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
