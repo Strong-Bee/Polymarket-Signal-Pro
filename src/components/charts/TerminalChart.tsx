@@ -4,10 +4,10 @@
  */
 
 import React, { useEffect, useRef } from "react";
-import { createChart, ColorType } from "lightweight-charts";
+import { createChart, ColorType, AreaSeries, LineSeries } from "lightweight-charts";
 
 interface TerminalChartProps {
-  data: { time: number | string; value: number }[];
+  data: { time?: number | string; timestamp?: number; value: number }[];
   title?: string;
   isArea?: boolean;
 }
@@ -47,7 +47,7 @@ export const TerminalChart: React.FC<TerminalChartProps> = ({ data, title = "YES
 
     let series;
     if (isArea) {
-      series = chart.addAreaSeries({
+      series = chart.addSeries(AreaSeries, {
         lineColor: "#00ff88",
         topColor: "rgba(0, 255, 136, 0.25)",
         bottomColor: "rgba(0, 255, 136, 0.0)",
@@ -58,7 +58,7 @@ export const TerminalChart: React.FC<TerminalChartProps> = ({ data, title = "YES
         }
       });
     } else {
-      series = chart.addLineSeries({
+      series = chart.addSeries(LineSeries, {
         color: "#ffaa00",
         lineWidth: 2,
         priceFormat: {
@@ -70,21 +70,25 @@ export const TerminalChart: React.FC<TerminalChartProps> = ({ data, title = "YES
 
     seriesRef.current = series;
 
+    const processedData = [...data]
+      .map(item => {
+        let t = item.time ?? item.timestamp;
+        let timeVal = typeof t === "number" ? t : new Date(t as string).getTime() / 1000;
+        return { time: Math.floor(timeVal), value: item.value };
+      })
+      .filter(item => !isNaN(item.time) && !isNaN(item.value));
+
     // Sort data to satisfy lightweight-charts order specs (ascending order required)
-    const sortedData = [...data].sort((a, b) => {
-      const aTime = typeof a.time === "number" ? a.time : new Date(a.time).getTime() / 1000;
-      const bTime = typeof b.time === "number" ? b.time : new Date(b.time).getTime() / 1000;
-      return aTime - bTime;
+    const sortedData = processedData.sort((a, b) => a.time - b.time);
+
+    // Remove duplicates
+    const uniqueData = sortedData.filter((item, index, arr) => {
+      if (index === 0) return true;
+      return item.time > arr[index - 1].time;
     });
 
-    // Formatting times appropriately as numbers (seconds timestamps)
-    const formattedData = sortedData.map(item => ({
-      time: typeof item.time === "number" ? item.time : Math.floor(new Date(item.time).getTime() / 1000),
-      value: item.value
-    }));
-
-    if (formattedData.length > 0) {
-      series.setData(formattedData);
+    if (uniqueData.length > 0) {
+      series.setData(uniqueData);
     }
 
     // Auto-fit content dynamically
